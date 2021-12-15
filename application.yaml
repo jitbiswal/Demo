@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-argo-application
+  namespace: argocd
+spec:
+  project: default # all applications has to be inside a project. if unspecified, it is default
+
+  source:
+    repoURL: https://github.com/jitbiswal/Demo.git   # the URL of the repository
+    targetRevision: HEAD     # from which position to take the code
+    path: argocd  # from which branch the code should be taken
+  destination:
+    server: https://kubernetes.default.svc # K8s cluster API
+    namespace: myapp  # namespace under which the objects will be created in the K8s cluster
+
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true  # Create the namespace if it does not exists
+    automated:
+      selfHeal: true # automatically syncs the desired state. It pull the configuration in every 3 minutes interval
+      prune: true # if the service.yaml, deployment.yaml is deleted/renamed from the GIT, the services/Pods will be deleted
+
+  
